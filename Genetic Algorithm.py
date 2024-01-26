@@ -143,15 +143,30 @@ def score_simulation(rounds, c1, c2) -> float:
 # Example Python module in C for Pacwar
 # https://www.geeksforgeeks.org/genetic-algorithms/
 def main():
-    gene_list = generate_genes(POPULATION_SIZE)
-    ones = [1] * 50
-    threes = [3] * 50
-    print("Example Python module in C for Pacwar")
-    print("all ones versus all threes ...")
-    (rounds, c1, c2) = _PyPacwar.battle(ones, threes)
-    print("Number of rounds:", rounds)
-    print("Ones PAC-mites remaining:", c1)
-    print("Threes PAC-mites remaining:", c2)
+    elitism_percent = .2
+    num_elite = elitism_percent * POPULATION_SIZE
+    old_population = generate_genes(POPULATION_SIZE)
+    for i in range(5):
+        # clear old fitness scores
+        for gene in old_population:
+            gene.fitness = 0
+        round_robin(old_population)
+        # sort in order of fitness, greatest to least
+        old_population.sort(key=lambda gene: gene.fitness, reverse=True)
+        print(f"Best Gene in round {i}:\nGene: {old_population[0].gene}\nAverage Fitness: {old_population[0].fitness}")
+        # take the elite population
+        new_population = old_population[:int(num_elite)]
+        # populate the rest of the population with the elite's children (should eventually weight the parent selection)
+        while len(new_population) < POPULATION_SIZE:
+            p1 = new_population[random.randint(0,num_elite - 1)]
+            p2 = new_population[random.randint(0,num_elite - 1)]
+            new_population.append(mate(p1, p2))
+        old_population = new_population
+        
+    
+    # show top 3 genes after generations
+    for i in range(3):
+        print(f"{i}th Best Gene after Experiment:\nGene: {old_population[0].gene}\nAverage Fitness: {old_population[0].fitness}")
 
 def test():
     # check generate_genes
