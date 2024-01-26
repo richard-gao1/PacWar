@@ -9,9 +9,9 @@ GENES = [0,1,2,3]
 def generate_genes(num_genes: int) -> list:
     generated = []
     for _ in range(num_genes):
-        gene = []
+        gene  = ['3','3','0','0']
 
-        for _ in range(50):
+        for _ in range(46):
             r = random.randrange(4)
             gene.append(str(GENES[r]))
         
@@ -80,19 +80,11 @@ def score_simulation(rounds, c1, c2) -> float:
 # Example Python module in C for Pacwar
 # https://www.geeksforgeeks.org/genetic-algorithms/
 def main():
-
-    # num_genes = 50
-    # gene_list = generate_genes(num_genes)
     ones = [1] * 50
     threes = [3] * 50
-    # print("Example Python module in C for Pacwar")
-    # print("all ones versus all threes ...")
-    # (rounds, c1, c2) = _PyPacwar.battle(ones, threes)
-    # print("Number of rounds:", rounds)
-    # print("Ones PAC-mites remaining:", c1)
-    # print("Threes PAC-mites remaining:", c2)
+
     best_genes = [] # each elem is a tuple of the gene in list form and str form
-    for _ in range(3):
+    for _ in range(5):
         best_genes.append(find_optimal_gene())
     # temp = [3,3,0,0]
     # temp2 = [3] * (50-4)
@@ -115,7 +107,7 @@ def main():
         print("test remaining:", c1, "Threes PAC-mites remaining:", c2)
 
 def find_optimal_gene():
-    num_genes = 50
+    num_genes = 100
     gene_list = generate_genes(num_genes) # list of all 50 genes
     # print(gene_list)
     temp = ['3','3','0','0']
