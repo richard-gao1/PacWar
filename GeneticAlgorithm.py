@@ -83,16 +83,32 @@ def main():
 
     # num_genes = 50
     # gene_list = generate_genes(num_genes)
-    # ones = [1] * 50
-    # threes = [3] * 50
+    ones = [1] * 50
+    threes = [3] * 50
     # print("Example Python module in C for Pacwar")
     # print("all ones versus all threes ...")
     # (rounds, c1, c2) = _PyPacwar.battle(ones, threes)
     # print("Number of rounds:", rounds)
     # print("Ones PAC-mites remaining:", c1)
     # print("Threes PAC-mites remaining:", c2)
+    best_genes = [] # each elem is a tuple of the gene in list form and str form
     for _ in range(3):
-        find_optimal_gene()
+        best_genes.append(find_optimal_gene())
+    print('\n'.join([str(item[1]) for item in best_genes]))
+
+    for gene_list, gene_str in best_genes:
+        print("testing gene: ", gene_str)
+
+        print("versus all ones ...")
+        (rounds, c1, c2) = _PyPacwar.battle(gene_list, ones)
+        print("Number of rounds:", rounds)
+        print("test remaining:", c1, "Ones PAC-mites remaining:", c2)
+        print()
+
+        print("versus all threes ...")
+        (rounds, c1, c2) = _PyPacwar.battle(gene_list, threes)
+        print("Number of rounds:", rounds)
+        print("test remaining:", c1, "Threes PAC-mites remaining:", c2)
 
 def find_optimal_gene():
     num_genes = 50
@@ -100,10 +116,11 @@ def find_optimal_gene():
     results = round_robin(gene_list)
     # print(results)
     max_result = max(results)
-    print("best score: ", max_result)
+    # print("best score: ", max_result)
     best_gene = "".join(gene_list[results.index(max_result)])
     # print("best gene: ", gene_list[results.index(max_result)])
-    print("best_gene: ", best_gene)
+    # print("best_gene: ", best_gene)
+    return (gene_list[results.index(max_result)], best_gene)
 
 
 def test():
