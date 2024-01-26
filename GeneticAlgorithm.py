@@ -27,12 +27,15 @@ def round_robin(genes: list[int]) -> list[float]:
         for j in range(i+1, len(genes)):
             (rounds, c1, c2) = _PyPacwar.battle(genes[i], genes[j])
             score = score_simulation(rounds, c1, c2)
-            if score > 0:
-                results[i] += score
-                results[j] += 1 - score
-            else:
-                results[i] += 1 + score
-                results[j] += -1 * score
+
+            results[i] = results[i] + score if score > 0 else results[i] + (1 + score)
+            results[j] = results[j] + (1 - score) if score > 0 else results[j] +(-1 * score)
+            # if score > 0:
+            #     results[i] += score
+            #     results[j] += 1 - score
+            # else:
+            #     results[i] += 1 + score
+            #     results[j] += -1 * score
     num_rounds = (len(genes) - 1) * len(genes) / 2
     results = [n/num_rounds for n in results]
     return results
@@ -120,5 +123,6 @@ if __name__ == "__main__":
     # run command with -t to run test, run without to run main
     if (args.test):
         test()
+        print("done with test")
     else:
         main()
