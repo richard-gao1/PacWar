@@ -1,4 +1,5 @@
 import _PyPacwar
+import argparse
 import numpy
 import random
 
@@ -8,11 +9,11 @@ GENES = [0,1,2,3]
 def generate_genes(num_genes: int) -> list:
     generated = []
     for _ in range(num_genes):
-        gene = ""
+        gene = []
 
         for _ in range(50):
             r = random.randrange(4)
-            gene += str(GENES[r])
+            gene.append(str(GENES[r]))
         
         generated.append(gene)
     
@@ -26,11 +27,18 @@ def round_robin(genes: list[int]) -> list[float]:
         for j in range(i+1, len(genes)):
             (rounds, c1, c2) = _PyPacwar.battle(genes[i], genes[j])
             score = score_simulation(rounds, c1, c2)
-            
-            
-    results = []
+            if score > 0:
+                results[i] += score
+                results[j] += 1 - score
+            else:
+                results[i] += 1 + score
+                results[j] += -1 * score
+    num_rounds = (len(genes) - 1) * len(genes) / 2
+    results = [n/num_rounds for n in results]
+    return results
 
-# scores a simulation - proportional to 100 - 10:10 --> .5, 20-0 --> 1
+# scores both populations in a simulation proportional to 1, if c2 is the winner, the score will be negative
+# 10-10 --> .5, 7-13 --> -13/20, 20-0 --> 1
 def score_simulation(rounds, c1, c2) -> float:
     score = 0 # higher score is better
     # checks if c1 or c2 wins
@@ -82,9 +90,12 @@ def main():
     print("Threes PAC-mites remaining:", c2)
 
 def test():
+    # check generate_genes
     genes = generate_genes(4)
-    print(genes)
+    assert(len(genes) == 4)
+    assert([len(gene) for gene in genes] == [50] * 4)
 
+    # check score_simulation
     assert(score_simulation(10, 0, 100) == -1)
     assert(score_simulation(101, 0, 100) == -19/20)
     assert(score_simulation(201, 10, 0) == 18/20)
@@ -96,7 +107,18 @@ def test():
     assert(score_simulation(500, 1.5, 1) == 11/20)
     assert(score_simulation(500, 100, 100) == 10/20)
 
+    # check round robin
+    results = round_robin(genes)
+    # print(results)
+    assert(sum(results) == 1)
+
 
 if __name__ == "__main__":
-    # main()
-    test()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--test", action="store_true")
+    args = parser.parse_args()
+    # run command with -t to run test, run without to run main
+    if (args.test):
+        test()
+    else:
+        main()
