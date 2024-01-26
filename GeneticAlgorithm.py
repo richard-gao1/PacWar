@@ -41,7 +41,7 @@ class Gene():
         """mutates each gene with a 2% chance (has a chance to mutate into itself, so true mutation rate is 1.5%)
         """
         for i in range(GENE_LENGTH):
-            if random.random() < Gene.mutation_rate:
+            if random.random() < Gene.mutation_rate:  # 10% chance
                 self.gene[i] = str(GENES[random.randint(0,3)])
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
@@ -64,16 +64,16 @@ def mate(parent1: Gene, parent2: Gene) -> Gene:
     return Gene(new_genome)
 
 def generate_genes(num_genes) -> list[Gene]:
-        """generates a list of gene sequences
+    """generates a list of gene sequences
 
-        :return list[gene]: a list of randomly generated genes
-        """
-        gene_list = []
-        for _ in range(num_genes):
-            gene = Gene()
-            gene_list.append(gene)
-        
-        return gene_list
+    :return list[gene]: a list of randomly generated genes
+    """
+    gene_list = []
+    for _ in range(num_genes):
+        gene = Gene()
+        gene_list.append(gene)
+    
+    return gene_list
 
 # simulates round robin competition between genes in list
 # returns percentage of wins for each placement
@@ -150,6 +150,7 @@ def main():
     old_population = generate_genes(POPULATION_SIZE)
     for i in range(num_generations):
         # clear old fitness scores
+        
         for gene in old_population:
             gene.fitness = 0
         round_robin(old_population)
@@ -157,7 +158,7 @@ def main():
         old_population.sort(key=lambda gene: gene.fitness, reverse=True)
         print(f"Best Gene in round {i}:\nGene: {old_population[0].gene}\nAverage Fitness: {old_population[0].fitness}")
         # take the elite population
-        new_population = old_population[:int(num_elite)]
+        new_population = old_population[:int(num_elite)] # just up to the elite
         # populate the rest of the population with the elite's children (should eventually weight the parent selection)
         while len(new_population) < POPULATION_SIZE:
             p1 = new_population[random.randint(0,num_elite - 1)]
