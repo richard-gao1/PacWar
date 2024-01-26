@@ -11,6 +11,7 @@ GENE_LENGTH = 50
 POPULATION_SIZE = 100
 
 class Gene():
+    mutation_rate = .02
     def __init__(self, genome: list[str] = None):
         """Gene Class initializer
 
@@ -40,7 +41,7 @@ class Gene():
         """mutates each gene with a 2% chance (has a chance to mutate into itself, so true mutation rate is 1.5%)
         """
         for i in range(GENE_LENGTH):
-            if random.random() < .02:
+            if random.random() < Gene.mutation_rate:
                 self.gene[i] = GENES[random.randint(0,3)]
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
@@ -145,8 +146,9 @@ def score_simulation(rounds, c1, c2) -> float:
 def main():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
+    num_generations = 10
     old_population = generate_genes(POPULATION_SIZE)
-    for i in range(5):
+    for i in range(num_generations):
         # clear old fitness scores
         for gene in old_population:
             gene.fitness = 0
@@ -160,7 +162,9 @@ def main():
         while len(new_population) < POPULATION_SIZE:
             p1 = new_population[random.randint(0,num_elite - 1)]
             p2 = new_population[random.randint(0,num_elite - 1)]
-            new_population.append(mate(p1, p2))
+            child = mate(p1, p2)
+            child.mutate()
+            new_population.append(child)
         old_population = new_population
         
     
