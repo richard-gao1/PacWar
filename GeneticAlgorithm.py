@@ -91,8 +91,8 @@ def main():
     # print("Number of rounds:", rounds)
     # print("Ones PAC-mites remaining:", c1)
     # print("Threes PAC-mites remaining:", c2)
-
-    find_optimal_gene()
+    for _ in range(3):
+        find_optimal_gene()
 
 def find_optimal_gene():
     num_genes = 50
@@ -101,7 +101,10 @@ def find_optimal_gene():
     # print(results)
     max_result = max(results)
     print("best score: ", max_result)
-    print("best gene: ", gene_list[results.index(max_result)])
+    best_gene = "".join(gene_list[results.index(max_result)])
+    # print("best gene: ", gene_list[results.index(max_result)])
+    print("best_gene: ", best_gene)
+
 
 def test():
     # check generate_genes
