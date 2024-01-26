@@ -11,7 +11,7 @@ GENE_LENGTH = 50
 POPULATION_SIZE = 100
 
 class Gene():
-    mutation_rate = .02
+    mutation_rate = .1
     def __init__(self, genome: list[str] = None):
         """Gene Class initializer
 
@@ -42,7 +42,7 @@ class Gene():
         """
         for i in range(GENE_LENGTH):
             if random.random() < Gene.mutation_rate:
-                self.gene[i] = GENES[random.randint(0,3)]
+                self.gene[i] = str(GENES[random.randint(0,3)])
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
     """generate offspring from parent1 and parent 2
