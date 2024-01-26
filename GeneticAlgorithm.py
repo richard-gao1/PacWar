@@ -94,7 +94,11 @@ def main():
     best_genes = [] # each elem is a tuple of the gene in list form and str form
     for _ in range(3):
         best_genes.append(find_optimal_gene())
-    print('\n'.join([str(item[1]) for item in best_genes]))
+    # temp = [3,3,0,0]
+    # temp2 = [3] * (50-4)
+    # temp.extend(temp2)
+    # best_genes.append((temp,33003333333333333333333333333333333333333333333333))
+    # print('\n'.join([str(item[1]) for item in best_genes]))
 
     for gene_list, gene_str in best_genes:
         print("testing gene: ", gene_str)
@@ -113,6 +117,13 @@ def main():
 def find_optimal_gene():
     num_genes = 50
     gene_list = generate_genes(num_genes) # list of all 50 genes
+    # print(gene_list)
+    temp = ['3','3','0','0']
+    temp2 = ['3'] * (50-4)
+    temp.extend(temp2)
+    # gene_list.append("33003333333333333333333333333333333333333333333333")
+    gene_list.append(temp)
+
     results = round_robin(gene_list)
     # print(results)
     max_result = max(results)
