@@ -45,14 +45,22 @@ class Gene():
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
     """generate offspring from parent1 and parent 2
+       current crossover scheme is 50/50 for each gene U, V, W, X, Y, Z
 
     :param Gene parent1: the first parent to derive the genome from
     :param Gene parent2: the second parent to derive the genome from
     """
 
     # break points in gene -> 1-4; 5-20;                   (4bit)
-    #                         21-23; 24-26; 27-38; 39-50   (3bit)             
-
+    #                         21-23; 24-26; 27-38; 39-50   (3bit)    
+    new_genome = [-1] * 50
+    new_genome[0:4] = parent1.gene[0:4] if random.random() < .5 else parent2.gene[0:4]
+    new_genome[4:20] = parent1.gene[4:20] if random.random() < .5 else parent2.gene[4:20]
+    new_genome[20:23] = parent1.gene[20:23] if random.random() < .5 else parent2.gene[20:23]
+    new_genome[23:26] = parent1.gene[23:26] if random.random() < .5 else parent2.gene[23:26]
+    new_genome[26:38] = parent1.gene[26:38] if random.random() < .5 else parent2.gene[26:38]
+    new_genome[38:50] = parent1.gene[38:50] if random.random() < .5 else parent2.gene[38:50]         
+    return Gene(new_genome)
 
 def generate_genes(num_genes) -> list[Gene]:
         """generates a list of gene sequences
@@ -168,6 +176,12 @@ def test():
     round_robin(genes)
     # print(results)
     assert(sum([gene.fitness for gene in genes]) == 1)
+
+    # check mating pattern
+    parent1 = Gene([0]*50)
+    parent2 = Gene([1]*50)
+    offspring = mate(parent1, parent2)
+    print("Crossover of all 1's and all 0's\n" + offspring.gene)
 
 
 if __name__ == "__main__":
