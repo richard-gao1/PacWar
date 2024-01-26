@@ -81,16 +81,27 @@ def score_simulation(rounds, c1, c2) -> float:
 # https://www.geeksforgeeks.org/genetic-algorithms/
 def main():
 
+    # num_genes = 50
+    # gene_list = generate_genes(num_genes)
+    # ones = [1] * 50
+    # threes = [3] * 50
+    # print("Example Python module in C for Pacwar")
+    # print("all ones versus all threes ...")
+    # (rounds, c1, c2) = _PyPacwar.battle(ones, threes)
+    # print("Number of rounds:", rounds)
+    # print("Ones PAC-mites remaining:", c1)
+    # print("Threes PAC-mites remaining:", c2)
+
+    find_optimal_gene()
+
+def find_optimal_gene():
     num_genes = 50
-    gene_list = generate_genes(num_genes)
-    ones = [1] * 50
-    threes = [3] * 50
-    print("Example Python module in C for Pacwar")
-    print("all ones versus all threes ...")
-    (rounds, c1, c2) = _PyPacwar.battle(ones, threes)
-    print("Number of rounds:", rounds)
-    print("Ones PAC-mites remaining:", c1)
-    print("Threes PAC-mites remaining:", c2)
+    gene_list = generate_genes(num_genes) # list of all 50 genes
+    results = round_robin(gene_list)
+    # print(results)
+    max_result = max(results)
+    print("best score: ", max_result)
+    print("best gene: ", gene_list[results.index(max_result)])
 
 def test():
     # check generate_genes
