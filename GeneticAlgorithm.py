@@ -11,7 +11,7 @@ GENE_LENGTH = 50
 POPULATION_SIZE = 100
 
 class Gene():
-    mutation_rate = .1
+    mutation_rate = .2 # will decrease
     def __init__(self, genome: list[str] = None):
         """Gene Class initializer
 
@@ -69,9 +69,75 @@ def generate_genes(num_genes) -> list[Gene]:
     :return list[gene]: a list of randomly generated genes
     """
     gene_list = []
-    for _ in range(num_genes):
+    for _ in range(num_genes - (4 + 1)):
         gene = Gene()
         gene_list.append(gene)
+
+    def gen_specific_len_genome(num: int)->list[int]:
+        gene = []
+        # for _ in range(num):
+        #     r = random.randrange(4)
+        #     gene.append(str(GENES[r]))
+        # print("Gene", gene)
+        gene = ['3'] * num
+        return gene
+    
+    # u(4), v(16), w(3), x(3), y(12), z(12)
+    best_U = ['3','3','0','0']
+    best_U.extend(gen_specific_len_genome(50-4))
+    gene = Gene()
+    gene.gene = best_U
+    print("len U: ", len(gene.gene))
+    gene_list.append(gene)
+    print("best_U", best_U)
+
+    best_X = gen_specific_len_genome(4+16+3)
+    best_X.extend(['2','2','2'])
+    best_X.extend(gen_specific_len_genome(12+12))
+    gene = Gene()
+    gene.gene = best_X
+    gene_list.append(gene)
+    print("len X: ", len(gene.gene))
+    print("Best_X", best_X)
+
+    best_W = gen_specific_len_genome(4+16)
+    best_W.extend(['2','2','2'])
+    best_W.extend(gen_specific_len_genome(3+12+12))
+    gene = Gene()
+    gene.gene = best_W
+    print("len W: ", len(gene.gene))
+    gene_list.append(gene)
+
+
+    Z_gene = ['1','1','1','0','0','0','0','0','0','0','0','0']
+    best_Z = gen_specific_len_genome(4+16+3+3+12)
+    best_Z.extend(Z_gene)
+    gene = Gene()
+    gene.gene = best_Z
+    gene_list.append(gene)
+    print("len Z: ", len(gene.gene))
+    print("".join(gene.gene), "YAS")
+
+    # U+X also won
+
+    # from_other_rounds = [['0', '0', '0', '0', '0', '1', '0', '1', '2', '1', '1', '0', '2', '2', '2', '2', '3', '3', '3', '2', '1', '1', '2', '1', '1', '1', '1', '1', '3', '3', '2', '1', '1', '2', '2', '3', '2', '3', '3', '1', '2', '1', '0', '2', '2', '3', '2', '3', '3', '3'],
+    #                      ]
+
+    # for g in from_other_rounds:
+    #     gene = Gene()
+    #     gene.gene = g
+    #     gene_list.append(gene)
+
+    
+    # add all ones and all threes
+    gene = Gene()
+    threes = ['3'] * 25
+    ones = []
+    gene.gene = ['3'] * 25 
+    # gene_list.append(gene)
+    # gene = Gene()
+    # gene.gene = ['1'] * 50
+    # gene_list.append(gene)
     
     return gene_list
 
@@ -95,7 +161,7 @@ def round_robin(genes: list[Gene]):
                 genes[j].fitness += -1 * score
     num_rounds = (len(genes) - 1) * len(genes) / 2
     for gene in genes:
-        gene.fitness /= num_rounds
+        gene.fitness /= POPULATION_SIZE
     return
 
 def score_simulation(rounds, c1, c2) -> float:
@@ -110,6 +176,13 @@ def score_simulation(rounds, c1, c2) -> float:
     score = 0 # higher score is better
     # checks if c1 or c2 wins
     c1_wins = 1 if c1 >= c2 else -1
+
+    if rounds == 500 and c1_wins == 1:  # so we win
+        score += 100 # massively inflate score
+    if rounds < 500 and c1_wins == 1:
+        score += 1000
+    if rounds == 500:
+        score += 50 # pretty good
 
     # checking if the simulation ended in a population completely winning
     if (rounds < 500):
@@ -140,13 +213,24 @@ def score_simulation(rounds, c1, c2) -> float:
 
     score *= c1_wins
     return score
-    
+
 # Example Python module in C for Pacwar
 # https://www.geeksforgeeks.org/genetic-algorithms/
 def main():
+    test = Gene()
+    test.gene = ['3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+    # Average Fitness: 0.9770000000000003
+    threes = ['3'] * 50
+    (rounds, c1, c2) = _PyPacwar.battle(test.gene, threes)
+    print("TESTbattle: rounds: ", rounds, c1, "-", c2)
+
+    generate_top_three_genes()
+
+def generate_top_three_genes():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
-    num_generations = 10
+    num_generations = 100
+
     old_population = generate_genes(POPULATION_SIZE)
     for i in range(num_generations):
         # clear old fitness scores
@@ -165,13 +249,18 @@ def main():
             p2 = new_population[random.randint(0,num_elite - 1)]
             child = mate(p1, p2)
             child.mutate()
+            child.mutation_rate *= 0.6 # so decrease mutation rate every time
             new_population.append(child)
         old_population = new_population
         
     
     # show top 3 genes after generations
+    threes = ['3'] * 50
     for i in range(3):
         print(f"{i}th Best Gene after Experiment:\nGene: {old_population[0].gene}\nAverage Fitness: {old_population[0].fitness}")
+        (rounds, c1, c2) = _PyPacwar.battle(old_population[i].gene, threes)
+        print("battle: rounds: ", rounds, c1, "-", c2)
+
 
 def test():
     # check generate_genes
