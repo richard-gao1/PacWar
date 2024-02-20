@@ -12,7 +12,7 @@ POPULATION_SIZE = 100
 
 class Gene():
     mutation_rate = .1
-    def __init__(self, genome: list[str] = None):
+    def __init__(self, genome: list[int] = None):
         """Gene Class initializer
 
         :param list[str] genome: a list of strings representing a gene,
@@ -33,7 +33,7 @@ class Gene():
         gene = []
         for _ in range(GENE_LENGTH):
             r = random.randrange(4)
-            gene.append(str(GENES[r]))
+            gene.append(GENES[r])
         
         return gene
     
@@ -42,34 +42,50 @@ class Gene():
         """
         for i in range(GENE_LENGTH):
             if random.random() < Gene.mutation_rate:  # 10% chance
-                self.gene[i] = str(GENES[random.randint(0,3)])
+                self.gene[i] = GENES[random.randint(0,3)]
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
     """generate offspring from parent1 and parent 2
-       current crossover scheme is 50/50 for each gene U, V, W, X, Y, Z
+       current crossover scheme is 50/50 at some break between genes U, V, W, X, Y, Z
 
     :param Gene parent1: the first parent to derive the genome from
     :param Gene parent2: the second parent to derive the genome from
     """
 
     # break points in gene -> 1-4; 5-20;                   (4bit)
-    #                         21-23; 24-26; 27-38; 39-50   (3bit)    
+    #                         21-23; 24-26; 27-38; 39-50   (3bit)   
+    breakpoints = [4,20,23,26,38] 
+    flip_point = breakpoints[random.randint(0,4)]
+    flip_order = random.randint(0,1)
+
     new_genome = [-1] * 50
-    new_genome[0:4] = parent1.gene[0:4] if random.random() < .5 else parent2.gene[0:4]
-    new_genome[4:20] = parent1.gene[4:20] if random.random() < .5 else parent2.gene[4:20]
-    new_genome[20:23] = parent1.gene[20:23] if random.random() < .5 else parent2.gene[20:23]
-    new_genome[23:26] = parent1.gene[23:26] if random.random() < .5 else parent2.gene[23:26]
-    new_genome[26:38] = parent1.gene[26:38] if random.random() < .5 else parent2.gene[26:38]
-    new_genome[38:50] = parent1.gene[38:50] if random.random() < .5 else parent2.gene[38:50]         
+    new_genome[0:flip_point] = parent1.gene[0:flip_point] if flip_order == 0 else parent2.gene[0:flip_point]
+    new_genome[flip_point:] = parent2.gene[flip_point:] if flip_order == 0 else parent1.gene[flip_point:]
+
+    # old cross over scheme flipping each gene
+    
+    # new_genome[0:4] = parent1.gene[0:4] if random.random() < .5 else parent2.gene[0:4]
+    # new_genome[4:20] = parent1.gene[4:20] if random.random() < .5 else parent2.gene[4:20]
+    # new_genome[20:23] = parent1.gene[20:23] if random.random() < .5 else parent2.gene[20:23]
+    # new_genome[23:26] = parent1.gene[23:26] if random.random() < .5 else parent2.gene[23:26]
+    # new_genome[26:38] = parent1.gene[26:38] if random.random() < .5 else parent2.gene[26:38]
+    # new_genome[38:50] = parent1.gene[38:50] if random.random() < .5 else parent2.gene[38:50]         
     return Gene(new_genome)
 
-def generate_genes(num_genes) -> list[Gene]:
+def generate_genes(num_genes: int, preset_genes: list[list[int]] = []) -> list[Gene]:
     """generates a list of gene sequences
 
-    :return list[gene]: a list of randomly generated genes
+    :param int num_genes: the number of genes to be generated
+    :param list[list[int]] preset_genes: a list of integer lists representing genes to seed the population with
+    :return list[gene]: a list of seeded and randomly generated genes
     """
     gene_list = []
-    for _ in range(num_genes):
+    # convert the seeded gene list into actual Gene objects
+    for i in range(len(preset_genes)):
+        gene = Gene(preset_genes[i])
+        gene_list.append(gene)
+    # generate the rest of the desired number of genes randomly
+    for _ in range(num_genes - len(preset_genes)):
         gene = Gene()
         gene_list.append(gene)
     
@@ -93,9 +109,8 @@ def round_robin(genes: list[Gene]):
             else:
                 genes[i].fitness += 1 + score
                 genes[j].fitness += -1 * score
-    num_rounds = (len(genes) - 1) * len(genes) / 2
     for gene in genes:
-        gene.fitness /= num_rounds
+        gene.fitness /= (len(genes) - 1)
     return
 
 def score_simulation(rounds, c1, c2) -> float:
@@ -147,7 +162,8 @@ def main():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
     num_generations = 10
-    old_population = generate_genes(POPULATION_SIZE)
+    # seed the initial population with all 1 and all 3 genes
+    old_population = generate_genes(POPULATION_SIZE, [[1]*50, [3]*50])
     for i in range(num_generations):
         # clear old fitness scores
         
@@ -204,12 +220,29 @@ def test():
     print("Crossover of all 1's and all 0's\n" + offspring.gene)
 
 
+def condense(gene: str) -> str:
+    """ takes a printed list of strings representing a gene and 
+        condenses it into a sequence of integers that can be ported 
+        into the pacwar simulation
+
+    :param str gene: a printed list of strings representing a gene
+    :return str: the condensed string of integers representing a gene
+    """
+    clean_gene = ""
+    for char in gene:
+        if char.isdigit():
+            clean_gene += char
+    return clean_gene
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--test", action="store_true")
+    parser.add_argument("-c", "--condense", action="store")
     args = parser.parse_args()
     # run command with -t to run test, run without to run main
     if (args.test):
         test()
+    elif (args.condense):
+        print(condense(args.condense))
     else:
         main()
