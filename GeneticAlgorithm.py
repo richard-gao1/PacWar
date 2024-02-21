@@ -3,15 +3,28 @@ import argparse
 import numpy
 import random
 
+def convert_gene(gene: str) -> list[int]:
+    converted_gene =[]
+    for nucleotide in gene:
+        converted_gene.append(int(nucleotide))
+    return converted_gene
+
 # valid genes
 GENES = [0,1,2,3]
 # length of a gene
 GENE_LENGTH = 50
 # population size
-POPULATION_SIZE = 100
+POPULATION_SIZE = 200
+# mutation rate
+MUTATION_RATE = .02
+# number of generations
+NUM_GENERATIONS = 10
+# seeded genes
+SEEDED_POPULATION = [[1]*50, [3]*50]
+# adding best genes to seeded population
+SEEDED_POPULATION.append(convert_gene("10111111111111111111111111111111111111111211111311"))
 
 class Gene():
-    mutation_rate = .1
     def __init__(self, genome: list[int] = None):
         """Gene Class initializer
 
@@ -41,7 +54,7 @@ class Gene():
         """mutates each gene with a 2% chance (has a chance to mutate into itself, so true mutation rate is 1.5%)
         """
         for i in range(GENE_LENGTH):
-            if random.random() < Gene.mutation_rate:  # 10% chance
+            if random.random() < MUTATION_RATE:
                 self.gene[i] = GENES[random.randint(0,3)]
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
@@ -161,10 +174,9 @@ def score_simulation(rounds, c1, c2) -> float:
 def main():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
-    num_generations = 10
     # seed the initial population with all 1 and all 3 genes
-    old_population = generate_genes(POPULATION_SIZE, [[1]*50, [3]*50])
-    for i in range(num_generations):
+    old_population = generate_genes(POPULATION_SIZE, SEEDED_POPULATION)
+    for i in range(NUM_GENERATIONS):
         # clear old fitness scores
         
         for gene in old_population:
@@ -187,7 +199,7 @@ def main():
     
     # show top 3 genes after generations
     for i in range(3):
-        print(f"{i}th Best Gene after Experiment:\nGene: {old_population[0].gene}\nAverage Fitness: {old_population[0].fitness}")
+        print(f"{i + 1}th Best Gene after Experiment:\nGene: {old_population[i].gene}\nAverage Fitness: {old_population[i].fitness}")
 
 def test():
     # check generate_genes
@@ -243,6 +255,8 @@ if __name__ == "__main__":
     if (args.test):
         test()
     elif (args.condense):
-        print(condense(args.condense))
+        condensed = condense(args.condense)
+        print(condensed)
+        print(convert_gene(condensed))
     else:
         main()
