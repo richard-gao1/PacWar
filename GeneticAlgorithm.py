@@ -257,6 +257,5 @@ if __name__ == "__main__":
     elif (args.condense):
         condensed = condense(args.condense)
         print(condensed)
-        print(convert_gene(condensed))
     else:
         main()
