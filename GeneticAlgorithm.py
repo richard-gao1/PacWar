@@ -3,11 +3,24 @@ import argparse
 import numpy
 import random
 
-def convert_gene(gene: str) -> list[int]:
+def convert_gene_str2list(gene: str) -> list[int]:
     converted_gene =[]
     for nucleotide in gene:
         converted_gene.append(int(nucleotide))
     return converted_gene
+
+def convert_gene_list2str(gene: list[int]) -> str:
+    """ takes a list of integers representing a gene and 
+        condenses it into a string of integers that can be ported 
+        into the pacwar simulation
+
+    :param str gene: a printed list of strings representing a gene
+    :return str: the condensed string of integers representing a gene
+    """
+    clean_gene = ""
+    for nucleotide in gene:
+        clean_gene += str(nucleotide)
+    return clean_gene
 
 # valid genes
 GENES = [0,1,2,3]
@@ -22,7 +35,7 @@ NUM_GENERATIONS = 10
 # seeded genes
 SEEDED_POPULATION = [[1]*50, [3]*50]
 # adding best genes to seeded population
-SEEDED_POPULATION.append(convert_gene("10111111111111111111111111111111111111111211111311"))
+SEEDED_POPULATION.append(convert_gene_str2list("10111111111111111111111111111111111111111211111311"))
 
 class Gene():
     def __init__(self, genome: list[int] = None):
@@ -257,6 +270,6 @@ if __name__ == "__main__":
     elif (args.condense):
         condensed = condense(args.condense)
         print(condensed)
-        print(convert_gene(condensed))
+        print(convert_gene_str2list(condensed))
     else:
         main()
