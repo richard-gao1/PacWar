@@ -17,10 +17,7 @@ def convert_gene_list2str(gene: list[int]) -> str:
     :param str gene: a printed list of strings representing a gene
     :return str: the condensed string of integers representing a gene
     """
-    clean_gene = ""
-    for nucleotide in gene:
-        clean_gene += str(nucleotide)
-    return clean_gene
+    return "".join(gene)
 
 # valid genes
 GENES = [0,1,2,3]
