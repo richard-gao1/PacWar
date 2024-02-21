@@ -10,6 +10,8 @@ GENE_LENGTH = 50
 # population size
 POPULATION_SIZE = 100
 
+mutation = 0.5
+
 class Gene():
     mutation_rate = .2 # will decrease
     def __init__(self, genome: list[str] = None):
@@ -40,8 +42,9 @@ class Gene():
     def mutate(self):
         """mutates each gene with a 2% chance (has a chance to mutate into itself, so true mutation rate is 1.5%)
         """
+        print("mutation rate: ", self.mutation_rate)
         for i in range(GENE_LENGTH):
-            if random.random() < Gene.mutation_rate:  # 10% chance
+            if random.random() < mutation:  # 10% chance
                 self.gene[i] = str(GENES[random.randint(0,3)])
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
@@ -131,13 +134,9 @@ def generate_genes(num_genes) -> list[Gene]:
     
     # add all ones and all threes
     gene = Gene()
-    threes = ['3'] * 25
-    ones = []
-    gene.gene = ['3'] * 25 
-    # gene_list.append(gene)
-    # gene = Gene()
-    # gene.gene = ['1'] * 50
-    # gene_list.append(gene)
+    gene.gene = ['1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '1', '1', '1', '1', '1', '3', '1', '1']
+
+    gene_list.append(gene)
     
     return gene_list
 
@@ -219,9 +218,10 @@ def score_simulation(rounds, c1, c2) -> float:
 def main():
     test = Gene()
     test.gene = ['3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+    lst = ['1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '1', '1', '1', '1', '1', '3', '1', '1']
     # Average Fitness: 0.9770000000000003
     threes = ['3'] * 50
-    (rounds, c1, c2) = _PyPacwar.battle(test.gene, threes)
+    (rounds, c1, c2) = _PyPacwar.battle(lst, threes)
     print("TESTbattle: rounds: ", rounds, c1, "-", c2)
 
     generate_top_three_genes()
@@ -252,6 +252,7 @@ def generate_top_three_genes():
             child.mutation_rate *= 0.6 # so decrease mutation rate every time
             new_population.append(child)
         old_population = new_population
+        mutation *= .8
         
     
     # show top 3 genes after generations
