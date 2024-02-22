@@ -14,7 +14,11 @@ def load_gene_pool(filename:str) -> list[ga.Gene]:
     return gene_pool
 
 def experiment(num_generations: int, population_size: int, seeded_population: list[list[int]], elitism_percent: int = .2):
+    # load the constant gene pool
     constant_gene_pool = load_gene_pool("randomGenePool.csv")
+    # load the current results and add to seeded population
+    discovered_gene_pool = load_gene_pool("results.csv")
+    seeded_population.extend([gene.gene for gene in discovered_gene_pool])
     num_elite = elitism_percent * population_size
     # create the initial population
     old_population = ga.generate_genes(population_size, seeded_population)
