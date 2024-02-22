@@ -5,16 +5,16 @@ import _PyPacwar
 
 # Random genes
 
-def load_constant_gene_pool() -> list[ga.Gene]:
+def load_gene_pool(filename:str) -> list[ga.Gene]:
     gene_pool = []
-    with open("randomGenePool.csv", newline='', mode='r') as file:
+    with open(filename, newline='', mode='r') as file:
         csvFile = csv.DictReader(file)
         for rows in csvFile:
             gene_pool.append(ga.Gene(ga.convert_gene_str2list(rows['gene'])))
     return gene_pool
 
 def experiment(num_generations: int, population_size: int, seeded_population: list[list[int]], elitism_percent: int = .2):
-    constant_gene_pool = load_constant_gene_pool()
+    constant_gene_pool = load_gene_pool("randomGenePool.csv")
     num_elite = elitism_percent * population_size
     # create the initial population
     old_population = ga.generate_genes(population_size, seeded_population)
@@ -48,13 +48,13 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
         gene_dict["allOnes"] = ga.score_simulation(*_PyPacwar.battle(gene.gene, [1] * 50))
         gene_dict_list.append(gene_dict)
 
-    with open('results.csv', 'w') as csvfile:
+    with open('results.csv', 'a') as csvfile:
         # creating a csv dict writer object
         fields = ['gene', "constantPoolFitness", "allThrees", "allOnes"]
         writer = csv.DictWriter(csvfile, fieldnames=fields)
 
         # writing headers (field names)
-        writer.writeheader()
+        # writer.writeheader()
 
         # writing data rows
         writer.writerows(gene_dict_list)
