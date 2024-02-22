@@ -17,7 +17,7 @@ def convert_gene_list2str(gene: list[int]) -> str:
     :param str gene: a printed list of strings representing a gene
     :return str: the condensed string of integers representing a gene
     """
-    return "".join(gene)
+    return "".join([str(x) for x in gene])
 
 # valid genes
 GENES = [0,1,2,3]
@@ -135,6 +135,19 @@ def round_robin(genes: list[Gene]):
     for gene in genes:
         gene.fitness /= (len(genes) - 1)
     return
+
+def single_vs_population_fitness(gene: Gene, population: list[Gene]):
+    gene.fitness = 0
+    for i in range(len(population)):
+        (rounds, c1, c2) = _PyPacwar.battle(gene.gene, population[i].gene)
+        score = score_simulation(rounds, c1, c2)
+        if score > 0:
+            gene.fitness += score
+        else:
+            gene.fitness += 1 + score
+    gene.fitness /= len(population)
+    return gene.fitness
+
 
 def score_simulation(rounds, c1, c2) -> float:
     """scores the results of a PyPacwar battle
