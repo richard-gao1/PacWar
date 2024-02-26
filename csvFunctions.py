@@ -48,13 +48,13 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
         gene_dict["allOnes"] = ga.score_simulation(*_PyPacwar.battle(gene.gene, [1] * 50))
         gene_dict_list.append(gene_dict)
 
-    with open('results.csv', 'w') as csvfile:
+    with open('results.csv', 'a') as csvfile:
         # creating a csv dict writer object
         fields = ['gene', "constantPoolFitness", "allThrees", "allOnes"]
         writer = csv.DictWriter(csvfile, fieldnames=fields)
 
         # writing headers (field names)
-        writer.writeheader()
+        # writer.writeheader()
 
         # writing data rows
         writer.writerows(gene_dict_list)

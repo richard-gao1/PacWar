@@ -198,6 +198,17 @@ def main():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
     # seed the initial population with all 1 and all 3 genes
+    test = Gene([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1])
+    yesterday = Gene(convert_gene_str2list("10111111111111111111111111111111111111111211111311"))
+    (rounds, c1, c2) = _PyPacwar.battle(test.gene, [1] * 50)
+    print("for all 1's: ", "rounds; ", rounds, "c1", c1, "c2", c2)
+    (rounds, c1, c2) = _PyPacwar.battle(test.gene, [3] * 50)
+    print("for all 3's: ", "rounds; ", rounds, "c1", c1, "c2", c2)
+    (rounds, c1, c2) = _PyPacwar.battle(test.gene, yesterday.gene)
+    print("for the one yestrday", "rounds; ", rounds, "c1", c1, "c2", c2)
+    # (rounds, c1, c2) = _PyPacwar.battle(yesterday.gene, )
+    
+
     old_population = generate_genes(POPULATION_SIZE, SEEDED_POPULATION)
     for i in range(NUM_GENERATIONS):
         # clear old fitness scores
