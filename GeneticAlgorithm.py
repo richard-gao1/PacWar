@@ -25,8 +25,6 @@ GENES = [0,1,2,3]
 GENE_LENGTH = 50
 # population size
 POPULATION_SIZE = 200
-# mutation rate
-MUTATION_RATE = .02
 # number of generations
 NUM_GENERATIONS = 10
 # seeded genes
@@ -35,6 +33,8 @@ SEEDED_POPULATION = [[1]*50, [3]*50]
 SEEDED_POPULATION.append(convert_gene_str2list("10111111111111111111111111111111111111111211111311"))
 
 class Gene():
+    # mutation rate
+    mutation_rate = .08
     def __init__(self, genome: list[int] = None):
         """Gene Class initializer
 
@@ -64,8 +64,11 @@ class Gene():
         """mutates each gene with a 2% chance (has a chance to mutate into itself, so true mutation rate is 1.5%)
         """
         for i in range(GENE_LENGTH):
-            if random.random() < MUTATION_RATE:
+            if random.random() < self.mutation_rate:
                 self.gene[i] = GENES[random.randint(0,3)]
+    
+    def decrease_mutation(self):
+        self.mutation_rate *= 0.9
 
 def mate(parent1: Gene, parent2: Gene) -> Gene:
     """generate offspring from parent1 and parent 2
@@ -198,7 +201,8 @@ def main():
     elitism_percent = .2
     num_elite = elitism_percent * POPULATION_SIZE
     # seed the initial population with all 1 and all 3 genes
-    test = Gene([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1])
+    test = Gene([1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1, 1])
+    
     yesterday = Gene(convert_gene_str2list("10111111111111111111111111111111111111111211111311"))
     (rounds, c1, c2) = _PyPacwar.battle(test.gene, [1] * 50)
     print("for all 1's: ", "rounds; ", rounds, "c1", c1, "c2", c2)
@@ -207,6 +211,8 @@ def main():
     (rounds, c1, c2) = _PyPacwar.battle(test.gene, yesterday.gene)
     print("for the one yestrday", "rounds; ", rounds, "c1", c1, "c2", c2)
     # (rounds, c1, c2) = _PyPacwar.battle(yesterday.gene, )
+
+
     
 
     old_population = generate_genes(POPULATION_SIZE, SEEDED_POPULATION)
@@ -227,6 +233,7 @@ def main():
             p2 = new_population[random.randint(0,num_elite - 1)]
             child = mate(p1, p2)
             child.mutate()
+            child.decrease_mutation()
             new_population.append(child)
         old_population = new_population
         
@@ -266,6 +273,7 @@ def test():
     print("Crossover of all 1's and all 0's\n" + offspring.gene)
 
 
+
 def condense(gene: str) -> str:
     """ takes a printed list of strings representing a gene and 
         condenses it into a sequence of integers that can be ported 
@@ -291,6 +299,6 @@ if __name__ == "__main__":
     elif (args.condense):
         condensed = condense(args.condense)
         print(condensed)
-        print(convert_gene_str2list(condensed))
+        # print(convert_gene_str2list(condensed))
     else:
         main()
