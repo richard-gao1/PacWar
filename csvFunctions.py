@@ -1,5 +1,7 @@
 import csv
 import GeneticAlgorithm as ga
+import pandas as pd
+import argparse
 import random
 import _PyPacwar
 
@@ -14,8 +16,6 @@ def load_gene_pool(filename:str) -> list[ga.Gene]:
     return gene_pool
 
 def experiment(num_generations: int, population_size: int, seeded_population: list[list[int]], elitism_percent: int = .2):
-    # load the constant gene pool
-    constant_gene_pool = load_gene_pool("randomGenePool.csv")
     # load the current results and add to seeded population
     discovered_gene_pool = load_gene_pool("results.csv")
     seeded_population.extend([gene.gene for gene in discovered_gene_pool])
@@ -47,14 +47,14 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
         gene_dict = {}
         gene_dict["gene"] = ga.convert_gene_list2str(gene.gene)
         # gene_dict["experimentalFitness"] = gene.fitness
-        gene_dict["constantPoolFitness"] = ga.single_vs_population_fitness(gene, constant_gene_pool)
+        gene_dict["discoveredPoolFitness"] = ga.single_vs_population_fitness(gene, discovered_gene_pool)
         gene_dict["allThrees"] = ga.score_simulation(*_PyPacwar.battle(gene.gene, [3] * 50))
         gene_dict["allOnes"] = ga.score_simulation(*_PyPacwar.battle(gene.gene, [1] * 50))
         gene_dict_list.append(gene_dict)
 
     with open('results.csv', 'a') as csvfile:
         # creating a csv dict writer object
-        fields = ['gene', "constantPoolFitness", "allThrees", "allOnes"]
+        fields = ['gene', "discoveredPoolFitness", "allThrees", "allOnes"]
         writer = csv.DictWriter(csvfile, fieldnames=fields)
 
         # writing headers (field names)
@@ -63,8 +63,17 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
         # writing data rows
         writer.writerows(gene_dict_list)
 
+def update_discovered_fitness():
+    pass
+
 if __name__ == "__main__":
-    experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--update", action="store_true")
+    args = parser.parse_args()
+    if(args.update):
+        update_discovered_fitness()
+    else:
+        experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
 
 
 
