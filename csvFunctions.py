@@ -8,6 +8,11 @@ import _PyPacwar
 # Random genes
 
 def load_gene_pool(filename:str) -> list[ga.Gene]:
+    """reads a csv file that is assumed to have a list of genes under header 'gene'
+
+    :param str filename: name of the csv file to read
+    :return list[ga.Gene]: a list of genes held in the CSV file
+    """
     gene_pool = []
     with open(filename, newline='', mode='r') as file:
         csvFile = csv.DictReader(file)
@@ -16,6 +21,13 @@ def load_gene_pool(filename:str) -> list[ga.Gene]:
     return gene_pool
 
 def experiment(num_generations: int, population_size: int, seeded_population: list[list[int]], elitism_percent: int = .2):
+    """run a genetic algorithm experiment and update the result csv
+
+    :param int num_generations: number of generations in the algorithm (how many rounds)
+    :param int population_size: number of genes in each generation
+    :param list[list[int]] seeded_population: a list of list representations of genes to seed the intial population
+    :param int elitism_percent: what percent of the population that you carry over to the next generation, defaults to .2
+    """
     # load the current results and add to seeded population
     discovered_gene_pool = load_gene_pool("results.csv")
     seeded_population.extend([gene.gene for gene in discovered_gene_pool])
@@ -63,7 +75,22 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
         # writing data rows
         writer.writerows(gene_dict_list)
 
-def update_discovered_fitness():
+def update_discovered_fitness(filename: str):
+    df = pd.read_csv(filename)
+    discovered_gene_pool = load_gene_pool("results.csv")
+    # recalculate the fitness based on discovered gene pool
+    # print(df.loc[:, ['gene', 'discoveredPoolFitness']])
+    new_fitness = []
+    for gene_code in df.loc[:, 'gene']:
+        gene = ga.Gene(ga.convert_gene_str2list(gene_code))
+        ga.single_vs_population_fitness(gene, discovered_gene_pool)
+        new_fitness.append(gene.fitness)
+        # print(gene)
+    # newFitness = pd.Series([1, 1, 1, 1])
+    df['discoveredPoolFitness'] = new_fitness
+    # print(df.loc[:, ['gene', 'discoveredPoolFitness']])
+    df.to_csv(filename)
+    
     pass
 
 if __name__ == "__main__":
@@ -71,7 +98,7 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--update", action="store_true")
     args = parser.parse_args()
     if(args.update):
-        update_discovered_fitness()
+        update_discovered_fitness("results.csv")
     else:
         experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
 

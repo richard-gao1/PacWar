@@ -4,6 +4,11 @@ import numpy
 import random
 
 def convert_gene_str2list(gene: str) -> list[int]:
+    """takes a string representing a gene and converts it to its list equivalent
+
+    :param str gene: a string representing a gene
+    :return list[int]: the list representation of the inputted gene
+    """
     converted_gene =[]
     for nucleotide in gene:
         converted_gene.append(int(nucleotide))
@@ -38,7 +43,7 @@ class Gene():
     def __init__(self, genome: list[int] = None):
         """Gene Class initializer
 
-        :param list[str] genome: a list of strings representing a gene,
+        :param list[int] genome: a list of strings representing a gene,
                                  must be of length GENE_LENGTH, defaults to None
         """
         if genome:
