@@ -8,7 +8,8 @@ import _PyPacwar
 # Random genes
 
 def load_gene_pool(filename:str) -> list[ga.Gene]:
-    """reads a csv file that is assumed to have a list of genes under header 'gene'
+    """reads a csv file that is assumed to have a list of genes under header 'gene'.
+    Order the gene by their discovered fitness and return the list
 
     :param str filename: name of the csv file to read
     :return list[ga.Gene]: a list of genes held in the CSV file
@@ -17,8 +18,10 @@ def load_gene_pool(filename:str) -> list[ga.Gene]:
     with open(filename, newline='', mode='r') as file:
         csvFile = csv.DictReader(file)
         for rows in csvFile:
-            gene_pool.append(ga.Gene(ga.convert_gene_str2list(rows['gene'])))
-    return gene_pool
+            gene_pool.append((ga.Gene(ga.convert_gene_str2list(rows['gene'])), rows['discoveredPoolFitness']))
+        gene_pool.sort(reverse=True, key=lambda gene: gene[1])
+        # print(gene_pool)
+    return [gene[0] for gene in gene_pool]
 
 def experiment(num_generations: int, population_size: int, seeded_population: list[list[int]], elitism_percent: int = .2):
     """run a genetic algorithm experiment and update the result csv
@@ -30,6 +33,7 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
     """
     # load the current results and add to seeded population
     discovered_gene_pool = load_gene_pool("results.csv")
+    # TODO: grab only the elite discovered genes (once 200 or more genes generated, slice discovered)
     seeded_population.extend([gene.gene for gene in discovered_gene_pool])
     num_elite = elitism_percent * population_size
     # create the initial population
@@ -89,18 +93,20 @@ def update_discovered_fitness(filename: str):
     # newFitness = pd.Series([1, 1, 1, 1])
     df['discoveredPoolFitness'] = new_fitness
     # print(df.loc[:, ['gene', 'discoveredPoolFitness']])
-    df.to_csv(filename)
+    df.to_csv(filename, index=False)
     
     pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--update", action="store_true")
+    parser.add_argument("-r", "--runs", action="store", default=1)
     args = parser.parse_args()
     if(args.update):
-        update_discovered_fitness("results.csv")
+        update_discovered_fitness("result.csv")
     else:
-        experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
+        for _ in range(int(args.runs)):
+            experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
 
 
 
