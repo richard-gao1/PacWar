@@ -34,7 +34,7 @@ def experiment(num_generations: int, population_size: int, seeded_population: li
     # load the current results and add to seeded population
     discovered_gene_pool = load_gene_pool("results.csv")
     # TODO: grab only the elite discovered genes (once 200 or more genes generated, slice discovered)
-    seeded_population.extend([gene.gene for gene in discovered_gene_pool])
+    seeded_population.extend([gene.gene for gene in discovered_gene_pool[:200]])
     num_elite = elitism_percent * population_size
     # create the initial population
     old_population = ga.generate_genes(population_size, seeded_population)
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--runs", action="store", default=1)
     args = parser.parse_args()
     if(args.update):
-        update_discovered_fitness("result.csv")
+        update_discovered_fitness("results.csv")
     else:
         for _ in range(int(args.runs)):
             experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
