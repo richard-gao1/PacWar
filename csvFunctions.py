@@ -105,7 +105,9 @@ if __name__ == "__main__":
     if(args.update):
         update_discovered_fitness("results.csv")
     else:
-        for _ in range(int(args.runs)):
+        for i in range(int(args.runs)):
+            print("Run number", i)
+            print("\n---------------------------")
             experiment(num_generations=ga.NUM_GENERATIONS, population_size=ga.POPULATION_SIZE, seeded_population=ga.SEEDED_POPULATION, elitism_percent=0.2)
 
 
